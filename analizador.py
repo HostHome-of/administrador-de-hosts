@@ -22,9 +22,11 @@ class Analizar():
             raise Exception("Modo no encontrado")
 
         data = funcion(Analizar(self.cuerda))
+        return data
 
     def crear(self):
         response = self.ayuda._crear()
+        return response
 
     def eliminar(self):
         pass

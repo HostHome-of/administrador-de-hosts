@@ -3,7 +3,8 @@ import rstr
 import git
 from pathlib import Path
 from time import sleep
-import stat
+from win32 import win32api
+from win32.lib import win32con
 
 class Ayudantes():
     def __init__(self, cuerda:str):
@@ -31,16 +32,16 @@ class Ayudantes():
         os.mkdir(RUTA)
         git.Repo.clone_from(url=self.param2, to_path=RUTA)
 
-        if not ".host.home" in os.listdir(RUTA):
-            # try:
-            #     shutil.rmtree(RUTA)
-            # except:
-            #     for root, dirs, files in os.walk(RUTA, topdown=False):
-            #         for name in files:
-            #             os.chmod(os.path.join(root, name), 0o777)
-            #             os.remove(os.path.join(root, name))
-            #         for name in dirs:
-            #             os.rmdir(os.path.join(root, name))
-            # os.rmdir(RUTA)
-            return [False, "Noy hay un .host.home en tu ruta padre"]
+        if not ".hosthome" in os.listdir(RUTA):
+            try:
+                shutil.rmtree(RUTA)
+            except:
+                for root, dirs, files in os.walk(RUTA, topdown=False):
+                    for name in files:
+                        win32api.SetFileAttributes(os.path.join(root, name), win32con.FILE_ATTRIBUTE_NORMAL)
+                        os.remove(os.path.join(root, name))
+                    for name in dirs:
+                        os.rmdir(os.path.join(root, name))
+            os.rmdir(RUTA)
+            return [False, "No hay un .hosthome en tu ruta padre"]
 

@@ -2,6 +2,9 @@ import socket
 import requests
 
 from analizador import Analizar
+import asyncio
+
+import json
 
 config = requests.get("https://raw.githubusercontent.com/HostHome-of/config/main/config.json").json()
 
@@ -21,4 +24,7 @@ while True:
                     break
 
                 msg = Analizar(data).ejecutar()
-                # server.sendall(f"{msg}".encode())
+
+                msg = {'mensage': msg}
+
+                conn.sendall(json.dumps(msg).encode())

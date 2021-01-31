@@ -1,3 +1,4 @@
 requests
 rstr
 GitPython
+pywin32
