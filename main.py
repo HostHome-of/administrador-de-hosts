@@ -11,6 +11,9 @@ config = requests.get("https://raw.githubusercontent.com/HostHome-of/config/main
 HOST =  config["socket"]["host"]
 PORT =  config["socket"]["puerto"]
 
+# Esto es para tests :)
+# Analizar("crear|Buscador|https://github.com/maubg-debug/Buscador.git").ejecutar()
+
 while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind((HOST, PORT))
