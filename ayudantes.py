@@ -1,5 +1,6 @@
 import os, shutil
-import rstr
+import rstr, pprint
+from pathlib import Path
 import git
 from pathlib import Path
 from time import sleep
@@ -26,45 +27,42 @@ class Ayudantes():
 
         return _token
 
+    def __eliminar_carpeta(self, RUTA):
+        try:
+            shutil.rmtree(RUTA)
+        except:
+            for root, dirs, files in os.walk(RUTA, topdown=False):
+                for name in files:
+                    win32api.SetFileAttributes(os.path.join(root, name), win32con.FILE_ATTRIBUTE_NORMAL)
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+        os.rmdir(RUTA)
+
     def _crear(self):
         token = self.__token()
         RUTA = f"./projectos/{token}"
         RUTA_LOGS = f"./logs/{token}.out"
-        os.mkdir(RUTA)
+        # os.mkdir(RUTA)
         git.Repo.clone_from(url=self.param2, to_path=RUTA)
 
         if not ".hosthome" in os.listdir(RUTA):
-            try:
-                shutil.rmtree(RUTA)
-            except:
-                for root, dirs, files in os.walk(RUTA, topdown=False):
-                    for name in files:
-                        win32api.SetFileAttributes(os.path.join(root, name), win32con.FILE_ATTRIBUTE_NORMAL)
-                        os.remove(os.path.join(root, name))
-                    for name in dirs:
-                        os.rmdir(os.path.join(root, name))
-            os.rmdir(RUTA)
+            self.__eliminar_carpeta(RUTA)
             return [False, "No hay un .hosthome en tu ruta padre"]
 
         cmdStart = None
+        lenguage = None
         with open(str(RUTA)+"/.hosthome", "r") as f:
             f = f.read()
             lineas = f.split("\n")
             for line in lineas:
                 if line.replace(" = \"", "").startswith("run"):
                     cmdStart = line.replace(" = \"", "").replace("run", "")[:-2]
+                if line.replace(" = \"", "").startswith("len"):
+                    lenguage = line.replace(" = \"", "").replace("len", "")[:-2]
 
         if cmdStart is None:
-            try:
-                shutil.rmtree(RUTA)
-            except:
-                for root, dirs, files in os.walk(RUTA, topdown=False):
-                    for name in files:
-                        win32api.SetFileAttributes(os.path.join(root, name), win32con.FILE_ATTRIBUTE_NORMAL)
-                        os.remove(os.path.join(root, name))
-                    for name in dirs:
-                        os.rmdir(os.path.join(root, name))
-            os.rmdir(RUTA)
+            self.__eliminar_carpeta(RUTA)
             return [False, "No hay un comando de empiezo"]
 
         open(RUTA_LOGS, 'a')
@@ -74,4 +72,38 @@ class Ayudantes():
             f.write(open("./ejemplo_output.sh", "r").read())
             f.close()
 
-        os.system(f"sh {RUTA}/output_hosthome.sh '{cmdStart}' {token}")
+        if not lenguage is None:
+            if lenguage == "python":
+                archivos_de_instalacion = []
+                git.Git(RUTA).clone("https://github.com/HostHome-of/python-buildpack.git")
+                for f in Path(RUTA).glob('python-buildpack/*'):
+                    if ".git" in str(f):
+                        continue
+                    try:
+                        shutil.copy(f, os.path.join(RUTA))
+                    except:
+                        continue
+                    archivos_de_instalacion.append(str(f).replace("python-buildpack\\", ""))
+
+                os.mkdir(os.path.join(RUTA) + "/bin")
+
+                for f_bin in Path(RUTA).glob('python-buildpack/bin/*'):
+                    try:
+                        shutil.copy(f_bin, os.path.join(RUTA)+"/bin")
+                    except:
+                        continue
+                    archivos_de_instalacion.append(str(f_bin).replace("python-buildpack\\", ""))      
+
+                os.system(f"sh {RUTA}/start_hosthome.sh {str(os.path.abspath(RUTA))}")
+
+                for archivo in archivos_de_instalacion:
+                    os.remove(archivo)
+
+                os.system(f"sh {RUTA}/output_hosthome.sh '{cmdStart}' {token}")
+
+                return [True, ""]
+            if lenguage == "node":
+                pass
+        else:
+            self.__eliminar_carpeta(RUTA)
+            return [False, "Lenguage no asignado"]
