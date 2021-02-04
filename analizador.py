@@ -25,7 +25,32 @@ class Analizar():
         return data
 
     def crear(self):
-        response = self.ayuda._crear()
+        info = self.ayuda._crear_ruta()
+        lenguage = info[0]
+        cmdStart = info[1]
+        token = info[2]
+
+        tipo = None
+
+        if lenguage in ["ruby", "python", "nodejs", "scala", "clojure", "cs", "php"]:
+            if lenguage == "ruby":
+               pass
+            elif lenguage == "python":
+                tipo = "python-buildpack"
+            elif lenguage == "nodejs":
+                tipo = "node-buildpack"
+            elif lenguage == "scala":
+                pass
+            elif lenguage == "clojure":
+                pass
+            elif lenguage == "cs":
+                pass
+            else: # php
+                pass
+        else:
+            return [False, "Ese lenguage no existe"] 
+
+        response = self.ayuda._crear(tipo, lenguage, cmdStart, token)
         return response
 
     def eliminar(self):

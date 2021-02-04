@@ -39,7 +39,7 @@ class Ayudantes():
                     os.rmdir(os.path.join(root, name))
         os.rmdir(RUTA)
 
-    def _crear(self):
+    def _crear_ruta(self):
         token = self.__token()
         RUTA = f"./projectos/{token}"
         RUTA_LOGS = f"./logs/{token}.out"
@@ -56,14 +56,21 @@ class Ayudantes():
             f = f.read()
             lineas = f.split("\n")
             for line in lineas:
-                if line.replace(" = \"", "").startswith("run"):
-                    cmdStart = line.replace(" = \"", "").replace("run", "")[:-2]
-                if line.replace(" = \"", "").startswith("len"):
-                    lenguage = line.replace(" = \"", "").replace("len", "")[:-2]
+                line = line.replace(" = \"", "")
+                if line.startswith("run"):
+                    cmdStart = line.replace("run", "")[:-2]
+                if line.startswith("len"):
+                    lenguage = line.replace("len", "")[:-2]
 
         if cmdStart is None:
             self.__eliminar_carpeta(RUTA)
             return [False, "No hay un comando de empiezo"]
+
+        return [lenguage, cmdStart, token]
+
+    def _crear(self, tipo, lenguage, cmdStart, token):
+        RUTA = f"./projectos/{token}"
+        RUTA_LOGS = f"./logs/{token}.out"      
 
         open(RUTA_LOGS, 'a')
         open(RUTA+"/output_hosthome.sh", 'a')
@@ -73,37 +80,35 @@ class Ayudantes():
             f.close()
 
         if not lenguage is None:
-            if lenguage == "python":
-                archivos_de_instalacion = []
-                git.Git(RUTA).clone("https://github.com/HostHome-of/python-buildpack.git")
-                for f in Path(RUTA).glob('python-buildpack/*'):
-                    if ".git" in str(f):
-                        continue
-                    try:
-                        shutil.copy(f, os.path.join(RUTA))
-                    except:
-                        continue
-                    archivos_de_instalacion.append(str(f).replace("python-buildpack\\", ""))
+            archivos_de_instalacion = []
+            git.Git(RUTA).clone(f"https://github.com/HostHome-of/{tipo}.git")
+            for f in Path(RUTA).glob(f'{tipo}/*'):
+                if ".git" in str(f):
+                    continue
+                try:
+                    shutil.copy(f, os.path.join(RUTA))
+                except:
+                    continue
+                archivos_de_instalacion.append(str(f).replace(f"{tipo}\\", ""))
 
+            if tipo == "python-buildpack":
                 os.mkdir(os.path.join(RUTA) + "/bin")
 
-                for f_bin in Path(RUTA).glob('python-buildpack/bin/*'):
+                for f_bin in Path(RUTA).glob('{tipo}/bin/*'):
                     try:
                         shutil.copy(f_bin, os.path.join(RUTA)+"/bin")
                     except:
                         continue
-                    archivos_de_instalacion.append(str(f_bin).replace("python-buildpack\\", ""))      
+                    archivos_de_instalacion.append(str(f_bin).replace("{tipo}\\", ""))      
 
-                os.system(f"sh {RUTA}/start_hosthome.sh {str(os.path.abspath(RUTA))}")
+            os.system(f"sh {RUTA}/start_hosthome.sh {str(os.path.abspath(RUTA))}")
 
-                for archivo in archivos_de_instalacion:
-                    os.remove(archivo)
+            for archivo in archivos_de_instalacion:
+                os.remove(archivo)
 
-                os.system(f"sh {RUTA}/output_hosthome.sh '{cmdStart}' {token}")
+            os.system(f"sh {RUTA}/output_hosthome.sh '{cmdStart}' {token}")
 
-                return [True, ""]
-            if lenguage == "node":
-                pass
+            return [True, f"{token}"]
         else:
             self.__eliminar_carpeta(RUTA)
             return [False, "Lenguage no asignado"]
