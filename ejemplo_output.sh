@@ -4,8 +4,11 @@ cd logs/
 directorio=`pwd`
 archivo=$directorio"\\"$2.out
 cd ..
-cd projectos
-cd $2
+cd $3
+
+cd hosthome_env
+source .\\Scripts\\activate
+cd ..
 
 # echo "nohup "$1" > "$2".out & "
-nohup $1 > "${archivo}" & 
+/usr/bin/nohup $1 > "${archivo}" & 

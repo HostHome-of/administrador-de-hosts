@@ -27,7 +27,11 @@ class Analizar():
     def crear(self):
         info = self.ayuda._crear_ruta()
         lenguage = info[0]
+
         cmdStart = info[1]
+        if lenguage == False:
+            return [False, cmdStart]
+
         token = info[2]
 
         tipo = None
