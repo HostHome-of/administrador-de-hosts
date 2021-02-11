@@ -15,15 +15,6 @@ class Analizar():
         except IndexError:
             pass
 
-    def ejecutar(self):
-        try:
-            funcion = getattr(Analizar, self.modo)
-        except AttributeError:
-            raise Exception("Modo no encontrado")
-
-        data = funcion(Analizar(self.cuerda))
-        return data
-
     def crear(self):
         info = self.ayuda._crear_ruta()
         lenguage = info[0]

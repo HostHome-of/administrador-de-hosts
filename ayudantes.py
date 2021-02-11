@@ -49,7 +49,7 @@ class Ayudantes():
         RUTA = f"{env['RUTA_DE_PROJECTOS']}\\{token}"
         RUTA_LOGS = f"./logs/{token}.out"
         # os.mkdir(RUTA)
-        git.Repo.clone_from(url=self.param2, to_path=RUTA)
+        git.Repo.clone_from(url=self.param1, to_path=RUTA)
 
         if not ".hosthome" in os.listdir(RUTA):
             self.__eliminar_carpeta(RUTA)
