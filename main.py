@@ -1,7 +1,7 @@
 import socket
 import requests
 
-from flask import Flask, redirect
+from flask import Flask, redirect, session, request
 
 from analizador import Analizar
 import asyncio
@@ -28,6 +28,13 @@ def paginaPrincipal():
 
 @app.route("/crear", methods=["GET", "POST"])
 def crear():
-    return {"mensage": Analizar("Buscador|https://github.com/maubg-debug/Buscador.git").crear()}
+    if session.method == "POST":
+        nombre = request.args.get("nombre") # Nombre
 
-app.run("localhost", 4000)
+        # Headers
+        gitUrl = request.headers.get("gitUrl")
+
+        return {"mensage": Analizar(f"{nombre}|{gitUrl}").crear()}
+
+if __name__ == "__main__":
+    app.run("localhost", 4000)
