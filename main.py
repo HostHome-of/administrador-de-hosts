@@ -1,7 +1,7 @@
 import socket
 import requests
 
-from flask import Flask, redirect, session, request
+from flask import Flask, redirect, session, request, url_for
 
 from analizador import Analizar
 import asyncio
@@ -28,13 +28,16 @@ def paginaPrincipal():
 
 @app.route("/crear", methods=["GET", "POST"])
 def crear():
-    if session.method == "POST":
+
+    if request.method == "POST":
         nombre = request.args.get("nombre") # Nombre
 
         # Headers
         gitUrl = request.headers.get("gitUrl")
 
         return {"mensage": Analizar(f"{nombre}|{gitUrl}").crear()}
+
+    return redirect(url_for("paginaPrincipal"))
 
 if __name__ == "__main__":
     app.run("localhost", 4000)

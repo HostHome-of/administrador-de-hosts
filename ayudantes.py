@@ -88,12 +88,9 @@ class Ayudantes():
             archivos_de_instalacion = []
             git.Git(RUTA).clone(f"https://github.com/HostHome-of/{tipo}.git")
             for f in Path(RUTA).glob(f'{tipo}/*'):
-                if ".git" in str(f):
-                    continue
-                try:
-                    shutil.copy(f, os.path.join(RUTA))
-                except:
-                    continue
+                if ".git" in str(f): continue
+                try: shutil.copy(f, os.path.join(RUTA))
+                except: continue
                 archivos_de_instalacion.append(str(f).replace(f"{tipo}\\", ""))
 
             if tipo == "python-buildpack":
