@@ -86,7 +86,7 @@ class Ayudantes():
 
         if not lenguage is None:
             archivos_de_instalacion = []
-            git.Git(RUTA).clone(f"https://github.com/HostHome-of/{tipo}.git")
+            git.Git(RUTA).clone(f"https://github.com/HostHome-oficial/{tipo}.git")
             for f in Path(RUTA).glob(f'{tipo}/*'):
                 if ".git" in str(f): continue
                 try: shutil.copy(f, os.path.join(RUTA))
